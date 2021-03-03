@@ -1,0 +1,215 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.bundle.min.js" integrity="sha384-1CmrxMRARb6aLqgBO7yyAxTOQE2AKb9GfXnEo760AUcUmFx3ibVJJAzGytlQcNXd" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div id="app" class="container">
+        <h1 class="text-center font-weight-bold">PRODUCTOS</h1>
+        <div class="card-footer">
+            Categoria
+            <select v-model="id_categoria" class="form-control">
+                <option value="0">Seleccionar</option>
+                <option v-for="item in categoria" :value="item.IDcategoria">{{item.TipoCategoria}}</option>
+            </select>
+            <br />
+            <button class="btn-primary btn" data-toggle="modal" data-target="#Nuevo">Nuevo</button>
+            <button class="btn-success btn" @click="BuscarProducto">Buscar</button>
+        </div>
+
+        <br />
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Codigo</th>
+                    <th scope="col">Producto</th>
+                    <th scope="col">Stock</th>
+                    <th scope="col">Precio</th>
+                    <th scope="col">Acciones</th>
+                </tr>
+            </thead>
+
+            <tr v-for="item in productos">
+                <td>{{item.IDproducto}}</td>
+                <td>{{item.NombreProducto}}</td>
+                <td>{{item.Stock}}</td>
+                <td>{{item.Precio}}</td>
+                <td>
+                    <button type="button" title="Actualizar" data-target="#Actualizar" style="background-color:deepskyblue" class="btn btn-primary" @click="ObtenerProducto(item.IDproducto)" data-toggle="modal"><i class="fas fa-pen-square"></i></button>
+                    <button value="Eliminar" title="Eliminar" class="btn-danger btn" @click="EliminarProducto(item.IDproducto)"><i class="fas fa-minus-square"></i></button>
+                </td>
+            </tr>
+
+        </table>
+
+        <div class="modal fade" id="Nuevo" tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true" data-backdrop="false">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color:blue">
+                        <h5 class="modal-title" id="exampleModalLongTitle" style="color:aliceblue">Nuevo Producto</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="form-group row">
+                                <label for="nombres" class="col-sm-2 col-form-label">Categoria</label>
+                                <div class="col-sm-10">
+                                    <select v-model="producto.IDCategoria" class="form-control">
+                                        <option v-for="item in categoria" :value="item.IDcategoria">{{item.TipoCategoria}}</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="nombres" class="col-sm-2 col-form-label">Nombre</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="nombres" v-model="producto.NombreProducto" placeholder="Nombre">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="categoria_id" class="col-sm-2 col-form-label">Stock</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="nombres" v-model="producto.Stock" placeholder="Stock">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="creditos" class="col-sm-2 col-form-label">Precio</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="precio" v-model="producto.Precio" placeholder="Precio">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" @click="AgregarProducto">Agregar</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="Actualizar" tabindex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true" data-backdrop="false">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color:deepskyblue">
+                        <h5 class="modal-title" id="exampleModalLongTitle" style="color:aliceblue">Modificar Producto</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="form-group row">
+                                <label for="nombres" class="col-sm-2 col-form-label">Categoria</label>
+                                <div class="col-sm-10">
+                                    <select v-model="producto.IDCategoria" class="form-control">
+                                        <option v-for="item in categoria" :value="item.IDcategoria">{{item.TipoCategoria}}</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="nombres" class="col-sm-2 col-form-label">Nombre</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="NombreProducto" v-model="producto.NombreProducto" placeholder="Nombre">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="categoria_id" class="col-sm-2 col-form-label">Stock</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="Stock" v-model="producto.Stock" placeholder="Stock">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="creditos" class="col-sm-2 col-form-label">Precio</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="Precio" v-model="producto.Precio" placeholder="Precio">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" @click="EditarProducto">Guardar</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+ 
+
+  
+</body>
+</html>
+
+<script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vue-resource/1.5.1/vue-resource.js"></script>
+
+<script>
+    new Vue({
+        el: "#app",
+        data: {
+            categoria: [],
+            id_categoria: 0,
+            productos: [],
+            producto:[],
+            urlAPI: "http://localhost:50031"
+        },
+        mounted: function () {
+            this.ListarCategoria();
+            this.ObtenerProducto(0);
+        }, methods: {
+            ListarCategoria: function () {
+                var url = this.urlAPI + "/api/Categoria/ListarCategoria";
+                this.$http.get(url).then(function (response) {
+                    this.categoria = response.body;
+                });
+            },
+            BuscarProducto: function () {
+                var url = this.urlAPI + "/api/Producto/ListaProducto?idCategoria=" + this.id_categoria;
+                this.$http.get(url).then(function (response) {
+                    this.productos = response.body;
+                });
+
+            },
+            EliminarProducto: function (id) {
+                var r = confirm("¿Esta seguro que desea eliminar el producto con id "+id+"?");
+                if (r == true) {
+                    var url = this.urlAPI + "/api/Producto/EliminarProducto?idProducto=" + id;
+                    this.$http.get(url).then(function (response) {
+                        this.BuscarProducto();
+                    });
+                } 
+            },
+            ObtenerProducto: function (id) {
+                var url = this.urlAPI + "/api/Producto/ObtenerProducto?idProducto=" + id;
+                this.$http.get(url).then(function (response) {
+                    this.producto = response.body;
+                });
+            },
+            EditarProducto: function () {
+                var url = this.urlAPI + "/api/Producto/ActualizarProducto";
+                this.$http.put(url, this.producto).then(function (response) {
+                    this.resultado = response.body;
+                    this.BuscarProducto();
+                    $("#Actualizar").modal("hide");
+                });
+            },
+            AgregarProducto: function () {
+                var url = this.urlAPI + "/api/Producto/AgregarProducto";
+                this.$http.post(url, this.producto).then(function (response) {
+                    this.BuscarProducto();
+                    $("#Nuevo").modal("hide");
+                });
+            }
+        }
+    });
+</script>
